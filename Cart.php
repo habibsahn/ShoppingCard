@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 
 
 class Cart
@@ -8,10 +8,20 @@ class Cart
      */
     private array $items = [];
 
-    // TODO Generate getters and setters of properties
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    public function setItems(array $items): void
+    {
+        $this->items = $items;
+    }
+
+
 
     /**
-     * Add Product $product into cart. If product already exists inside cart
+     * Add Product $product into the cart. If product already exists inside cart,
      * it must update quantity.
      * This must create CartItem and return CartItem from method
      * Bonus: $quantity must not become more than whatever
@@ -23,17 +33,28 @@ class Cart
      */
     public function addProduct(Product $product, int $quantity): CartItem
     {
-        //TODO Implement method
+        $cartItem = $this->findCartItem($product->getId());
+        if ($cartItem === null) {
+            $cartItem = new CartItem($product, 0);
+            $this->items[$product->getId()] = $cartItem;
+        }
+
+        $cartItem->increaseQuantity($quantity);
+        return $cartItem;
+    }
+
+    private function findCartItem(int $productId)
+    {
+        return $this->items[$productId] ?? null;
     }
 
     /**
      * Remove product from cart
      *
-     * @param Product $product
      */
     public function removeProduct(Product $product)
     {
-        //TODO Implement method
+        unset($this->items[$product->getId()]);
     }
 
     /**
@@ -43,7 +64,11 @@ class Cart
      */
     public function getTotalQuantity(): int
     {
-        //TODO Implement method
+        $sum = 0;
+        foreach ($this->items as $item) {
+            $sum += $item->getQuantity();
+        }
+        return $sum;
     }
 
     /**
@@ -53,6 +78,11 @@ class Cart
      */
     public function getTotalSum(): float
     {
-        //TODO Implement method
+        $totalSum = 0;
+        foreach ($this->items as $item) {
+            $totalSum += $item->getQuantity() * $item->getProduct()->getPrice();
+        }
+
+        return $totalSum;
     }
 }
